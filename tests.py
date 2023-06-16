@@ -15,7 +15,7 @@ def simple_circuit_marked(w, x):
 @qml.qnode(dev)
 def circuit_with_weights(w, x):
     qml.RX(x[0], wires=0, id="x0")
-#    qml.RY(x[1], wires=1)
+    qml.RY(x[1], wires=1, id="x1")
     qml.CNOT(wires=[1, 0])
 
     qml.Rot(*w[0], wires=0)
@@ -23,7 +23,7 @@ def circuit_with_weights(w, x):
     qml.CNOT(wires=[1, 0])
 
     qml.RX(x[0], wires=0, id="x0")
- #   qml.RY(x[1], wires=1)
+    # qml.RY(x[1], wires=1, id="x1")
     qml.CNOT(wires=[1, 0])
 
     return qml.expval(qml.PauliZ(0))
@@ -56,35 +56,54 @@ def fourier_coefficients_1D(circuit, w, x):
 
 weights = np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]])
 
-freqs, coeffs = fourier_coefficients_1D(simple_circuit_marked, weights, [0.1])
-
-print(freqs, coeffs)
-print()
-print("next")
-print()
-
-freqs, coeffs = fourier_coefficients_1D(circuit_with_weights, weights, [0.1])
-print(freqs, coeffs)
 
 
 
+# freqs, coeffs = fourier_coefficients_1D(simple_circuit_marked, weights, [0.1])
 
+# print(freqs, coeffs)
+# print()
+# print("next")
+# print()
 
+# freqs, coeffs = fourier_coefficients_1D(circuit_with_weights, weights, [0.1])
+# print(freqs, coeffs)
 
 
 
 
-def fourier_coefficients_dim(circuit, x):
+
+
+
+
+
+def fourier_coefficients_d_dim(circuit, w, x):
 
     d = len(x)
 
-    freqs = circuit_spectrum(simple_circuit_marked)(x)
-    num_coefs = []
+    freqs = circuit_spectrum(circuit)(w, x)
+    num_coeffs = []
+    pos_freqs = {}
 
-    for var, w in freqs.items():
-        num_coefs.append(int((len(freqs[var])-1)/2))
+    for var, fs in freqs.items():
+        num_freqs = (len(freqs[var])-1)//2
+        
+        pos_freqs[var] = fs[num_freqs:]
+        num_coeffs.append(num_freqs)
 
-    # Function has to be finished, this is judt a draft
+    coeffs = coefficients(partial(circuit, w), d, num_coeffs)
+    
 
-    coeffs = coefficients(simple_circuit_marked, d, num_coefs)
+    
+
+
+
+
+    print(freqs)
     print(np.round(coeffs, decimals=4))
+    print(np.round(coeffs[0][-1], decimals=4))
+
+    print(pos_freqs)
+
+
+fourier_coefficients_d_dim(circuit_with_weights, weights, [0.3, 0.1])
