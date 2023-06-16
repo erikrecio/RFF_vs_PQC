@@ -19,55 +19,68 @@ def fourier_coefficients_dD(circuit, w, x):
         degree.append(num_freqs) # Degree of the fourier series for each variable
 
     coeffs = coefficients(partial(circuit, w), d, degree) # Calculate the fourier coefficients for the exponential expansion
-    pos_coeffs = sin_cos_transf(d, coeffs, freqs) # Transform the coefficients into the sine-cosine expansion
+    freq_coeffs, pos_coeffs = sin_cos_transf(d, coeffs, freqs) # Transform the coefficients into the sine-cosine expansion
 
-    return pos_freqs, np.round(pos_coeffs, decimals=4)
+    return pos_freqs, freq_coeffs, np.round(pos_coeffs, decimals=4)
 
 
 
 # Recursive function. Finds all the possible combinations of the frequencies
 # given all the features and calculates the sine-cosine coefficients
-def sin_cos_transf(d, coeffs, freqs, pos=[], pos_done=[], pos_coeffs = [], last_i=-1, end=False):
+def sin_cos_transf(d, coeffs, freqs, pos=None, real_freqs=None, coeffs_final=None, freq_final=None, last_i=-1, end=None):
+    
+    if pos == None:
+        pos = []
+    if real_freqs == None:
+        real_freqs = []
+    if coeffs_final == None:
+        coeffs_final = []
+    if end == None:
+        end = [False]
+    if freq_final == None:
+        freq_final = []
+
     current_i = last_i + 1
     if current_i == d:
+            
+        coeff_search = coeffs
+        for k in range(d):
+            coeff_search = coeff_search[pos[k]]
+            
+        c = coeff_search
+
+        if tuple(pos) == tuple([0]*d):
+            cos_coef = c
+            sin_coef = 0
+            end[0] = True
+        else:
+            cos_coef = c + np.conj(c)
+            sin_coef = 1j*(c - np.conj(c))
         
-        if tuple(pos) not in pos_done:
-            
-            coeff_search = coeffs
-            for k in range(d):
-                coeff_search = coeff_search[pos[k]]
-                
-            c = coeff_search
-
-            if tuple(pos) == tuple([0]*d):
-                cos_coef = c
-                sin_coef = 0
-                end = True
-            else:
-                cos_coef = c + np.conj(c)
-                sin_coef = 1j*(c - np.conj(c))
-            
-            pos_coeffs.extend([np.real(cos_coef), np.real(sin_coef)])
-
-            minus_pos = []
-            for j in pos:
-                minus_pos.append(-j)
-
-            pos_done.extend([tuple(pos), tuple(minus_pos)])
+        coeffs_final.extend([np.real(cos_coef), np.real(sin_coef)])
+        freq_final.append(real_freqs.copy())
 
         del pos[-1]
+        del real_freqs[-1]
     else:
         num_freqs = len(freqs[list(freqs)[current_i]])
         for f in range(-(num_freqs-1)//2, (num_freqs-1)//2 + 1):
             pos.append(f)
-            sin_cos_transf(d, coeffs, freqs, pos, pos_done, pos_coeffs, current_i, end)
+            real_freqs.append(freqs[list(freqs)[current_i]][f+(num_freqs-1)//2])
+
+            sin_cos_transf(d, coeffs, freqs, pos, real_freqs, coeffs_final, freq_final, current_i, end)
+
+            if end[0]:
+                break
         try:
             del pos[-1]
+            del real_freqs[-1]
         except Exception:
             pass
 
-    # The coefficients returned are in increasing order with respect to the frequencies and order of features.
-    return pos_coeffs
+    # The coefficients returned are in increasing order with respect to the frequencies and order of features
+    # freq_final specifies which combination of frequencies goes with the coefficients
+    return freq_final, coeffs_final
 
 
 # Example of the order of returned coefficients
@@ -90,48 +103,3 @@ def sin_cos_transf(d, coeffs, freqs, pos=[], pos_done=[], pos_coeffs = [], last_
 # [ 2, -1] (doesn't appear because same as [-2,  1])
 # [ 2,  0] (doesn't appear because same as [-2,  0])
 # [ 2,  1] (doesn't appear because same as [-2, -1])
-
-
-
-
-
-def sin_cos_transf2(d, coeffs, freqs, pos=[], pos_done=[], pos_coeffs = [], last_i=-1):
-    current_i = last_i + 1
-    if current_i == d:
-        
-        if tuple(pos) not in pos_done:
-            
-            coeff_search = coeffs
-            for k in range(d):
-                coeff_search = coeff_search[pos[k]]
-                
-            c = coeff_search
-
-            if tuple(pos) == tuple([0]*d):
-                cos_coef = c
-                sin_coef = 0
-            else:
-                cos_coef = c + np.conj(c)
-                sin_coef = 1j*(c - np.conj(c))
-            
-            pos_coeffs.extend([np.real(cos_coef), np.real(sin_coef)])
-
-            minus_pos = []
-            for j in pos:
-                minus_pos.append(-j)
-
-            pos_done.extend([tuple(pos), tuple(minus_pos)])
-
-        del pos[-1]
-    else:
-        num_freqs = len(freqs[list(freqs)[current_i]])
-        for f in range(-(num_freqs-1)//2, (num_freqs-1)//2 + 1):
-            pos.append(f)
-            sin_cos_transf(d, coeffs, freqs, pos, pos_done, pos_coeffs, last_i=current_i)
-        try:
-            del pos[-1]
-        except Exception:
-            pass
-
-    # The coefficients returned are in increasing order with respect to the frequencies and order of features.
-    return pos_coeffs
