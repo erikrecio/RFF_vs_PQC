@@ -51,8 +51,8 @@ weights = np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]])
 
 
 
-freqs1, coeffs1 = fourier_coefficients_1D(simple_circuit_marked, weights, [0.1])
-print(freqs1, coeffs1)
+# freqs1, coeffs1 = fourier_coefficients_1D(simple_circuit_marked, weights, [0.1])
+# print(freqs1, coeffs1)
 
 freqs, freqs_coeffs, coeffs = fourier_coefficients_dD(simple_circuit_marked, weights, [0.1])
 print(freqs, freqs_coeffs, coeffs)
@@ -60,3 +60,5 @@ print(freqs, freqs_coeffs, coeffs)
 
 freqs, freqs_coeffs, coeffs = fourier_coefficients_dD(circuit_with_weights, weights, [0.1, 0.2, 0.3])
 print(freqs, freqs_coeffs, coeffs)
+
+

@@ -64,7 +64,7 @@ def sin_cos_transf(d, coeffs, freqs, pos=None, real_freqs=None, coeffs_final=Non
         del real_freqs[-1]
     else:
         num_freqs = len(freqs[list(freqs)[current_i]])
-        for f in range(-(num_freqs-1)//2, (num_freqs-1)//2 + 1):
+        for f in range((num_freqs-1)//2, -(num_freqs-1)//2 - 1, -1):
             pos.append(f)
             real_freqs.append(freqs[list(freqs)[current_i]][f+(num_freqs-1)//2])
 
@@ -78,7 +78,7 @@ def sin_cos_transf(d, coeffs, freqs, pos=None, real_freqs=None, coeffs_final=Non
         except Exception:
             pass
 
-    # The coefficients returned are in increasing order with respect to the frequencies and order of features
+    # The coefficients returned are in decreasing order on the frequencies and increasing order on the features
     # freq_final specifies which combination of frequencies for each feature goes with the coefficients
     return freq_final, coeffs_final
 
@@ -88,18 +88,18 @@ def sin_cos_transf(d, coeffs, freqs, pos=None, real_freqs=None, coeffs_final=Non
 # 'x0': [0, 1, 2]
 # 'x1': [0, 1]
 
-# [-2, -1]
-# [-2,  0]
-# [-2,  1]
-# [-1, -1]
-# [-1,  0]
-# [-1,  1]
-# [ 0, -1]
+# [ 2,  1]
+# [ 2,  0]
+# [ 2, -1]
+# [ 1,  1]
+# [ 1,  0]
+# [ 1, -1]
+# [ 0,  1]
 # [ 0,  0]
-# [ 0,  1] (doesn't appear because same as [ 0, -1])
-# [ 1, -1] (doesn't appear because same as [-1,  1])
-# [ 1,  0] (doesn't appear because same as [-1,  0])
-# [ 1,  1] (doesn't appear because same as [-1, -1])
-# [ 2, -1] (doesn't appear because same as [-2,  1])
-# [ 2,  0] (doesn't appear because same as [-2,  0])
-# [ 2,  1] (doesn't appear because same as [-2, -1])
+# [ 0, -1] (doesn't appear because same as [ 0,  1])
+# [-1,  1] (doesn't appear because same as [ 1, -1])
+# [-1,  0] (doesn't appear because same as [ 1,  0])
+# [-1, -1] (doesn't appear because same as [ 1,  1])
+# [-2,  1] (doesn't appear because same as [ 2, -1])
+# [-2,  0] (doesn't appear because same as [ 2,  0])
+# [-2, -1] (doesn't appear because same as [ 2,  1])
