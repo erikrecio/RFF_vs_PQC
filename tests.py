@@ -1,7 +1,5 @@
 import numpy as np
 import pennylane as qml
-from pennylane.fourier import circuit_spectrum, coefficients
-from functools import partial
 from fourier_coefficients_1D import fourier_coefficients_1D
 from fourier_coefficients_dD import fourier_coefficients_dD
 
