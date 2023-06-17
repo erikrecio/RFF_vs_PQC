@@ -19,7 +19,7 @@ def fourier_coefficients_dD(circuit, w, x):
         degree.append(num_freqs) # Degree of the fourier series for each variable
 
     coeffs = coefficients(partial(circuit, w), d, degree) # Calculate the fourier coefficients for the exponential expansion
-    freq_coeffs, pos_coeffs = sin_cos_transf(d, coeffs, freqs) # Transform the coefficients into the sine-cosine expansion
+    freq_coeffs, pos_coeffs = sin_cos_transf(d, coeffs, freqs) # Transform the coefficients into the sine-cosine expansion (pos_coeffs) Also returns the frequencies for each coefficient (freq_coeffs).
 
     return pos_freqs, freq_coeffs, np.round(pos_coeffs, decimals=4)
 
