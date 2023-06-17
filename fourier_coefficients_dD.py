@@ -31,13 +31,9 @@ def sin_cos_transf(d, coeffs, freqs, pos=None, real_freqs=None, coeffs_final=Non
     
     if pos == None:
         pos = []
-    if real_freqs == None:
         real_freqs = []
-    if coeffs_final == None:
         coeffs_final = []
-    if end == None:
         end = [False]
-    if freq_final == None:
         freq_final = []
 
     current_i = last_i + 1
