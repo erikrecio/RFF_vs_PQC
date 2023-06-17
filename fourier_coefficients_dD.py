@@ -79,7 +79,7 @@ def sin_cos_transf(d, coeffs, freqs, pos=None, real_freqs=None, coeffs_final=Non
             pass
 
     # The coefficients returned are in increasing order with respect to the frequencies and order of features
-    # freq_final specifies which combination of frequencies goes with the coefficients
+    # freq_final specifies which combination of frequencies for each feature goes with the coefficients
     return freq_final, coeffs_final
 
 
