@@ -5,11 +5,10 @@ from functools import partial
 from itertools import product
 
 
-def fourier_coefficients_dD(circuit, w, x):
-
-    d = len(x)
+def fourier_coefficients_dD(circuit, w, d):
 
     # Obtain the frequencies of the circuit with this function
+    x = [0]*d
     freqs = circuit_spectrum(circuit)(w, x)
 
     # Degree of the fourier series for each variable
@@ -18,11 +17,11 @@ def fourier_coefficients_dD(circuit, w, x):
     # Number of integer values for the indices n_i = -degree_i,...,0,...,degree_i
     k = 2 * degree + 1
 
-    # create generator for indices nvec = (n1, ..., nN), ranging from (-d1,...,-dN) to (d1,...,dN)
+    # Create generator for indices nvec = (n1, ..., nN), ranging from (-d1,...,-dN) to (d1,...,dN)
     n_ranges = [np.arange(deg, -deg - 1, -1) for deg in degree]
     nvecs = product(*n_ranges)
 
-    # here we will collect the discretized values of function f
+    # Here we will collect the discretized values of function f
     f_discrete = np.zeros(shape=tuple(k))
 
     spacing = (2 * np.pi) / k
@@ -31,7 +30,7 @@ def fourier_coefficients_dD(circuit, w, x):
     for nvec in nvecs:
         sampling_point = spacing * np.array(nvec)
 
-        # fill discretized function array with value of f at inputs
+        # Fill discretized function array with value of f at inputs
         f_discrete[nvec] = circuit(w, sampling_point)
         f_inf = abs(f_discrete[nvec]) if abs(f_discrete[nvec]) > f_inf else f_inf
 
@@ -51,7 +50,7 @@ def fourier_coefficients_dD(circuit, w, x):
         for k in range(d):
             c = c[nvec[k]]
         
-        # we calculate the cos and sin coefficients. We stop at 0 since the rest are repetitions of what is already calculated.
+        # We calculate the cos and sin coefficients. We stop at 0 since the rest are repetitions of what is already calculated.
         if tuple(nvec) == tuple([0]*d):
             cos_coef = c
             sin_coef = 0
@@ -60,8 +59,8 @@ def fourier_coefficients_dD(circuit, w, x):
             cos_coef = c + np.conj(c)
             sin_coef = 1j*(c - np.conj(c))
         
-        coeffs_final.extend([np.real(cos_coef), np.real(sin_coef)])
-        freq_final.append(list(nvec))
+        # coeffs_final.extend([np.real(cos_coef), np.real(sin_coef)]) # coefficients and frequencies, not needed for now
+        # freq_final.append(list(nvec))
         f_RKHS += np.real(cos_coef)**2 + np.real(sin_coef)**2
 
         if end:
