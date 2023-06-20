@@ -1,7 +1,7 @@
 import numpy as np
 import pennylane as qml
 from fourier_coefficients_1D import fourier_coefficients_1D
-from fourier_coefficients_dD import fourier_coefficients_dD
+from fourier_coefficients_dD import *
 
 dev = qml.device('default.qubit', wires=2)
 
@@ -54,11 +54,16 @@ weights = np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]])
 # freqs1, coeffs1 = fourier_coefficients_1D(simple_circuit_marked, weights, [0.1])
 # print(freqs1, coeffs1)
 
-freqs, freqs_coeffs, coeffs = fourier_coefficients_dD(simple_circuit_marked, weights, [0.1])
-print(freqs, freqs_coeffs, coeffs)
+a = fourier_coefficients_dD_old(simple_circuit_marked, weights, [0.1])
+print(a)
+
+a = fourier_coefficients_dD(simple_circuit_marked, weights, [0.1])
+print(a)
 
 
-freqs, freqs_coeffs, coeffs = fourier_coefficients_dD(circuit_with_weights, weights, [0.1, 0.2, 0.3])
-print(freqs, freqs_coeffs, coeffs)
 
+a = fourier_coefficients_dD_old(circuit_with_weights, weights, [0.1, 0.2, 0.3])
+print(a)
 
+a = fourier_coefficients_dD(circuit_with_weights, weights, [0.1, 0.2, 0.3])
+print(a)
