@@ -5,10 +5,11 @@ class Simple_circuit_marked:
 
     name = "simple_circuit_marked"
 
-    def __init__(self, n_qubits, dim_x):
+    def __init__(self, n_qubits, dim_x, layers):
         self.dim_x = 1
         self.dim_w = 2
         self.n_qubits = 2
+        self.layers = 0
 
     def circuit(self, w, x):
         qml.RX(x[0], wires=0, id="x0")
@@ -22,10 +23,11 @@ class Circuit_with_weights:
 
     name = "circuit_with_weights"
 
-    def __init__(self, n_qubits, dim_x):
+    def __init__(self, n_qubits, dim_x, layers):
         self.dim_x = 3
         self.dim_w = 6
         self.n_qubits = 2
+        self.layers = 0
 
     def circuit(self, w, x):
         qml.RX(x[0], wires=0, id="x0")
@@ -48,10 +50,11 @@ class Circuit_1:
 
     name = "circuit_1"
     
-    def __init__(self, n_qubits, dim_x):
+    def __init__(self, n_qubits, dim_x, layers):
         self.dim_x = dim_x
         self.dim_w = 3*n_qubits
         self.n_qubits = n_qubits
+        self.layers = n_qubits//dim_x
 
     def circuit(self, w, x):
 
@@ -66,5 +69,75 @@ class Circuit_1:
                 qml.CNOT(wires=[i,i+1])
             else:
                 qml.CNOT(wires=[i,0])
+
+        return qml.expval(qml.PauliZ(0))
+
+
+class Circuit_2:
+
+    name = "circuit_2"
+    
+    def __init__(self, n_qubits, dim_x, layers):
+        self.dim_x = dim_x
+        self.dim_w = 6*n_qubits
+        self.n_qubits = n_qubits
+        self.layers = n_qubits//dim_x
+
+    def circuit(self, w, x):
+        
+        for i in range(self.n_qubits):
+            qml.Rot(w[i], w[i+1], w[i+2], wires=i)
+
+        for i in range(self.n_qubits):
+            if self.n_qubits-i-1 != 0:
+                qml.CNOT(wires=[i,i+1])
+            else:
+                qml.CNOT(wires=[i,0])
+
+
+        for i in range(self.n_qubits):
+            qml.RX(x[i % self.dim_x], wires=i, id=f"x{i % self.dim_x}")
+
+
+        for i in range(self.n_qubits):
+            qml.Rot(w[3*self.n_qubits+i], w[3*self.n_qubits+i+1], w[3*self.n_qubits+i+2], wires=i)
+
+        for i in range(self.n_qubits):
+            if self.n_qubits-i-1 != 0:
+                qml.CNOT(wires=[i,i+1])
+            else:
+                qml.CNOT(wires=[i,0])
+
+        return qml.expval(qml.PauliZ(0))
+
+
+
+class Circuit_3:
+
+    name = "circuit_3"
+    
+    def __init__(self, n_qubits, dim_x, layers):
+        self.dim_x = dim_x
+        self.dim_w = 3*n_qubits
+        self.n_qubits = n_qubits
+        self.layers = layers
+
+    def circuit(self, w, x):
+        
+        for i in range(self.n_qubits):
+            qml.RX(x[i % self.dim_x], wires=i, id=f"x{i % self.dim_x}")
+            if i+1 == self.layers*self.dim_x:
+                break
+
+
+        for i in range(self.n_qubits):
+            qml.Rot(w[i], w[i+1], w[i+2], wires=i)
+
+        for i in range(self.n_qubits):
+            if self.n_qubits-i-1 != 0:
+                qml.CNOT(wires=[i,i+1])
+            else:
+                qml.CNOT(wires=[i,0])
+
 
         return qml.expval(qml.PauliZ(0))
