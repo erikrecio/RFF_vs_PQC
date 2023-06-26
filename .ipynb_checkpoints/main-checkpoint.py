@@ -8,6 +8,8 @@ from multiprocessing import Pool
 import os.path
 import time
 from datetime import datetime, timedelta
+# from pytz import timezone
+from backports.zoneinfo import ZoneInfo
 
 from fourier_coefficients_dD import fourier_coefficients_dD
 
@@ -61,16 +63,21 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, 
     print(f"{time.time()-start_test}s - {circuit.name} - w={round(weights_samples**circuit.dim_w)}, n={circuit.n_qubits}, L={circuit.layers}, x={circuit.dim_x}")
     
     
+    time_now = datetime.now(ZoneInfo("Europe/Madrid")).strftime("%d-%m-%Y %H-%M-%S")
+    name = f"{circuit.name} - w={round(weights_samples**circuit.dim_w)}, n={circuit.n_qubits}, L={circuit.layers}, x={circuit.dim_x}"
     
     # Save data
     if not os.path.isdir(f'Data/{folder_name}'):
         os.mkdir(f'Data/{folder_name}')
+        
     vec_f_inf = ["Inf. Norm"] + vec_f_inf
     vec_f_RKHS = ["RKHS norm"] + vec_f_RKHS
     RKHS_over_inf = ["RKHS/Inf"] + RKHS_over_inf
+    
     # temp_nvecs = [[f"theta_{i}" for i in range(circuit.dim_w)]] + temp_nvecs
-    file_name = f'{datetime.now().strftime("%d-%m-%Y %H-%M-%S")} - Norms_and_parameters of {circuit.name} - w={round(weights_samples**circuit.dim_w)}, n={circuit.n_qubits}, L={circuit.layers}, x={circuit.dim_x}'
+    file_name = f'{time_now} - Norms_and_parameters of {name}'
     np.savetxt(os.path.join(os.path.dirname(__file__), f'Data/{folder_name}/{file_name}.csv'), [[p[0], p[1], p[2]] for p in zip(vec_f_inf, vec_f_RKHS, RKHS_over_inf)], delimiter=',', fmt='%s')
+    
     vec_f_inf = vec_f_inf[1:]
     vec_f_RKHS = vec_f_RKHS[1:]
     RKHS_over_inf = RKHS_over_inf[1:]
@@ -79,20 +86,20 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, 
     # Save plots
     if not os.path.isdir(f'Plots/{folder_name}'):
         os.mkdir(f'Plots/{folder_name}')
-    names = ["Infiniy norm", "RKHS norm", "RKHS over Infinity"]
+    labels = ["Infiniy norm", "RKHS norm", "RKHS over Infinity"]
     datas = [vec_f_inf, vec_f_RKHS, RKHS_over_inf]
 
-    for name, data in zip(names, datas):
+    for label, data in zip(labels, datas):
         min_bin = min(data)
         max_bin = max(data)
         width_bin = (max_bin-min_bin)/(bins_hist-1)
         bins = np.arange(min_bin, max_bin + 3*width_bin/2, width_bin) if round(width_bin,8) != 0 else [max_bin - 0.5, max_bin + 0.5]
 
         plt.hist(data, bins=bins)
-        plot_name = f'{name} of {circuit.name} - w={round(weights_samples**circuit.dim_w)}, n={circuit.n_qubits}, L={circuit.layers}, x={circuit.dim_x}'
+        plot_name = f'{label} of {name}'
         plt.title(plot_name)
-        plt.xlabel(name)
+        plt.xlabel(label)
         plt.xlim(left=0)
-        file_name = f'{datetime.now().strftime("%d-%m-%Y %H-%M-%S")} - {plot_name}'
+        file_name = f'{time_now} - {plot_name}'
         plt.savefig(os.path.join(os.path.dirname(__file__), f'Plots/{folder_name}/{file_name}.png'))
         plt.clf()
