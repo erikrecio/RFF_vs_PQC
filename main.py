@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from fourier_coefficients_dD import fourier_coefficients_dD
 
 
-def main(weights_samples, weights_search, bins_hist, circuit, dev):
+def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name):
 
     weights_max = np.pi
     weights_min = -np.pi
@@ -50,18 +50,22 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev):
             bool_first_time = False
 
     # Save data
+    if not os.path.isdir(f'Data/{folder_name}'):
+        os.mkdir(f'Data/{folder_name}')
     vec_f_inf = ["Inf. Norm"] + vec_f_inf
     vec_f_RKHS = ["RKHS norm"] + vec_f_RKHS
     RKHS_over_inf = ["RKHS/Inf"] + RKHS_over_inf
     temp_nvecs = [[f"theta_{i}" for i in range(circuit.dim_w)]] + temp_nvecs
     file_name = f'{datetime.now().strftime("%d-%m-%Y %H-%M-%S")} - Norms_and_parameters of {circuit.name} - w={round(weights_samples**circuit.dim_w)}, n={circuit.n_qubits}, L={circuit.layers}, x={circuit.dim_x}'
-    np.savetxt(os.path.join(os.path.dirname(__file__), f'Data/{file_name}.csv'), [[p[0], p[1], p[2], *p[3]] for p in zip(vec_f_inf, vec_f_RKHS, RKHS_over_inf, temp_nvecs)], delimiter=',', fmt='%s')
+    np.savetxt(os.path.join(os.path.dirname(__file__), f'Data/{folder_name}/{file_name}.csv'), [[p[0], p[1], p[2], *p[3]] for p in zip(vec_f_inf, vec_f_RKHS, RKHS_over_inf, temp_nvecs)], delimiter=',', fmt='%s')
     vec_f_inf = vec_f_inf[1:]
     vec_f_RKHS = vec_f_RKHS[1:]
     RKHS_over_inf = RKHS_over_inf[1:]
     temp_nvecs = temp_nvecs[1:]
 
     # Save plots
+    if not os.path.isdir(f'Plots/{folder_name}'):
+        os.mkdir(f'Plots/{folder_name}')
     names = ["Infiniy norm", "RKHS norm", "RKHS over Infinity"]
     datas = [vec_f_inf, vec_f_RKHS, RKHS_over_inf]
 
@@ -77,5 +81,5 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev):
         plt.xlabel(name)
         plt.xlim(left=0)
         file_name = f'{datetime.now().strftime("%d-%m-%Y %H-%M-%S")} - {plot_name}'
-        plt.savefig(os.path.join(os.path.dirname(__file__), f'Plots/{file_name}.png'))
+        plt.savefig(os.path.join(os.path.dirname(__file__), f'Plots/{folder_name}/{file_name}.png'))
         plt.clf()
