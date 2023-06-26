@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from itertools import product
+from functools import partial
 import pennylane as qml
-# from multiprocessing import Pool
+from multiprocessing import Pool
 
 import os.path
 import time
@@ -11,7 +12,7 @@ from datetime import datetime, timedelta
 from fourier_coefficients_dD import fourier_coefficients_dD
 
 
-def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name):
+def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, multicpu):
 
     weights_max = np.pi
     weights_min = -np.pi
@@ -23,31 +24,34 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name):
     elif weights_search == "random":
         nvecs = np.random.uniform(low=-np.pi, high=np.pi, size=(int(weights_samples**circuit.dim_w), circuit.dim_w))
 
-    # pool = Pool(4)
-    # _, _, _, vec_f_inf, vec_f_RKHS = zip(*pool.map(partial(fourier_coefficients_dD, circuit=circuit, d=dim_x), nvecs))
+    if multicpu:
+        pool = Pool(2)
+        vec_f_inf, vec_f_RKHS = zip(*pool.map(partial(fourier_coefficients_dD, circuit=circuit, d=circuit.dim_x), nvecs))
+        RKHS_over_inf = [vec_f_RKHS[i]/inf for i, inf in enumerate(vec_f_inf)]
 
-    st = time.time()
-    j = 1
-    bool_first_time = True
+    else:
+        st = time.time()
+        j = 1
+        bool_first_time = True
 
-    vec_f_inf = []
-    vec_f_RKHS = []
-    RKHS_over_inf = []
-    # temp_nvecs = [] # This array use to print the values of the parameters together with the norms in the data csv
-    qnode = qml.QNode(circuit.circuit, dev)
-    for i, nvec in enumerate(nvecs,0):
-        f_inf, f_RKHS = fourier_coefficients_dD(qnode, nvec, circuit.dim_x)
-        vec_f_inf.append(f_inf)
-        vec_f_RKHS.append(f_RKHS)
-        RKHS_over_inf.append(f_RKHS/f_inf)
-        # temp_nvecs.append(list(nvec))
-        
-        perc = (i+1)/int(weights_samples**circuit.dim_w)*100
-        et = time.time() - st
-        if bool_first_time and et > 20 or perc/j >= 10 or  et/60/j >= 10:
-            print(f'{round(perc,2)} %, current = {time.strftime("%H:%M:%S", time.gmtime(et))}, total = {time.strftime("%d %H:%M:%S", time.gmtime(et/perc*100))}, left = {time.strftime("%H:%M:%S", time.gmtime(et/perc*100-et))}, finishes = {(datetime.now() + timedelta(seconds = et/perc*100-et)).strftime("%H-%M-%S %d-%m-%Y")}')
-            j = j+1
-            bool_first_time = False
+        vec_f_inf = []
+        vec_f_RKHS = []
+        RKHS_over_inf = []
+        # temp_nvecs = [] # This array use to print the values of the parameters together with the norms in the data csv
+        qnode = qml.QNode(circuit.circuit, dev)
+        for i, nvec in enumerate(nvecs,0):
+            f_inf, f_RKHS = fourier_coefficients_dD(qnode, nvec, circuit.dim_x)
+            vec_f_inf.append(f_inf)
+            vec_f_RKHS.append(f_RKHS)
+            RKHS_over_inf.append(f_RKHS/f_inf)
+            # temp_nvecs.append(list(nvec))
+            
+            perc = (i+1)/int(weights_samples**circuit.dim_w)*100
+            et = time.time() - st
+            if bool_first_time and et > 20 or perc/j >= 10 or  et/60/j >= 10:
+                print(f'{round(perc,2)} %, current = {time.strftime("%H:%M:%S", time.gmtime(et))}, total = {time.strftime("%d %H:%M:%S", time.gmtime(et/perc*100))}, left = {time.strftime("%H:%M:%S", time.gmtime(et/perc*100-et))}, finishes = {(datetime.now() + timedelta(seconds = et/perc*100-et)).strftime("%H-%M-%S %d-%m-%Y")}')
+                j = j+1
+                bool_first_time = False
 
     # Save data
     if not os.path.isdir(f'Data/{folder_name}'):

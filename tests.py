@@ -4,14 +4,15 @@ from circuits import *
 from main import main
 
 
-for layers in range(1,11):
+for layers in range(1,2):
     print(layers)
 
-    folder_name = "10. 1qubit, 2D, increasing layers"
+    folder_name = "Testing multiprocessing"
     dim_x = 2
-    n_qubits = 1 #layers*dim_x
+    n_qubits = layers*dim_x
+    multicpu = True
 
-    circuit_class = Circuit_1qubit # Simple_circuit_marked, Circuit_with_weights, Circuit_n
+    circuit_class = Simple_circuit_marked # Simple_circuit_marked, Circuit_with_weights, Circuit_n
     circuit = circuit_class(n_qubits, dim_x, layers)
 
     weights_samples = 10000**(1/circuit.dim_w)
@@ -20,7 +21,7 @@ for layers in range(1,11):
 
 
     dev = qml.device('lightning.qubit', wires=circuit.n_qubits)
-    main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name)
+    main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, multicpu)
 
 
 #%%
@@ -57,6 +58,7 @@ for dim_x in range(2,11):
     folder_name = "8. Layers = 2, increasing dim_x and n"
     layers = 2 #n_qubits//dim_x
     n_qubits = layers*dim_x
+    multicpu = False
 
     circuit_class = Circuit_3 # Simple_circuit_marked, Circuit_with_weights, Circuit_n
     circuit = circuit_class(n_qubits, dim_x, layers)
@@ -67,7 +69,7 @@ for dim_x in range(2,11):
 
 
     dev = qml.device('lightning.qubit', wires=circuit.n_qubits)
-    main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name)
+    main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, multicpu)
 
 #%%
 import time
