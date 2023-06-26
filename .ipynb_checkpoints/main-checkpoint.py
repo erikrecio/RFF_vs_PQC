@@ -26,6 +26,7 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, 
     
     qnode = qml.QNode(circuit.circuit, dev)
     
+    start_test = time.time()
     if num_cpus > 1:
         pool = Pool(num_cpus)
         args = [[qnode, nvec, circuit.dim_x] for nvec in nvecs]
@@ -56,7 +57,11 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, 
                 print(f'{round(perc,2)} %, current = {time.strftime("%H:%M:%S", time.gmtime(et))}, total = {time.strftime("%d %H:%M:%S", time.gmtime(et/perc*100))}, left = {time.strftime("%H:%M:%S", time.gmtime(et/perc*100-et))}, finishes = {(datetime.now() + timedelta(seconds = et/perc*100-et)).strftime("%H-%M-%S %d-%m-%Y")}')
                 j = j+1
                 bool_first_time = False
-
+    
+    print(f"{time.time()-start_test}s - {circuit.name} - w={round(weights_samples**circuit.dim_w)}, n={circuit.n_qubits}, L={circuit.layers}, x={circuit.dim_x}")
+    
+    
+    
     # Save data
     if not os.path.isdir(f'Data/{folder_name}'):
         os.mkdir(f'Data/{folder_name}')

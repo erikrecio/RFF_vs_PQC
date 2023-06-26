@@ -4,22 +4,21 @@ from circuits import *
 from main import main
 
 
-for num_cpus in range(10,251,10):
-    # print(layers)
+# for num_cpus in range(10,251,10):
+for layers in range(9,11):
+    print(layers)
     
-    layers = 5
-    folder_name = "Testing multiprocessing"
+    folder_name = "10. 1qubit, 2D, increasing layers"
     dim_x = 2
-    n_qubits = layers*dim_x
-    # num_cpus = 160
+    n_qubits = 1 #layers*dim_x
 
-    circuit_class = Circuit_1 # Simple_circuit_marked, Circuit_with_weights, Circuit_n
+    circuit_class = Circuit_1qubit # Simple_circuit_marked, Circuit_with_weights, Circuit_n
     circuit = circuit_class(n_qubits, dim_x, layers)
 
     weights_samples = 10000**(1/circuit.dim_w)
     weights_search = "random"  # random, grid
     bins_hist = 100
-
+    num_cpus = 160
 
     dev = qml.device('lightning.qubit', wires=circuit.n_qubits)
     main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, num_cpus)

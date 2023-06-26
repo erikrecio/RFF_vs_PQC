@@ -58,7 +58,7 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, 
                 j = j+1
                 bool_first_time = False
     
-    print(f"num_cpus = {num_cpus} - {time.time()-start_test}s")
+    print(f"{time.time()-start_test}s - {circuit.name} - w={round(weights_samples**circuit.dim_w)}, n={circuit.n_qubits}, L={circuit.layers}, x={circuit.dim_x}")
     
     
     
