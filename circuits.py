@@ -141,3 +141,26 @@ class Circuit_3:
 
 
         return qml.expval(qml.PauliZ(0))
+    
+
+class Circuit_1qubit:
+
+    name = "circuit_1qubit"
+    
+    def __init__(self, n_qubits, dim_x, layers):
+        self.dim_x = dim_x
+        self.dim_w = 3*(layers*dim_x + 1)
+        self.n_qubits = 1
+        self.layers = layers
+
+    def circuit(self, w, x):
+        
+        qml.Rot(w[0], w[1], w[2], wires=0)
+        pos = 3
+        for l in range(self.layers):
+            for d in range(self.dim_x):
+                qml.RX(x[d], wires=0, id=f"x{d}")
+                qml.Rot(w[pos], w[pos+1], w[pos+2], wires=0)
+                pos += 3
+
+        return qml.expval(qml.PauliZ(0))

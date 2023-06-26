@@ -6,10 +6,12 @@ from main import main
 
 for layers in range(1,11):
     print(layers)
-    dim_x = 1
-    n_qubits = 10 #layers*dim_x
 
-    circuit_class = Circuit_3 # Simple_circuit_marked, Circuit_with_weights, Circuit_n
+    folder_name = "10. 1qubit, 2D, increasing layers"
+    dim_x = 2
+    n_qubits = 1 #layers*dim_x
+
+    circuit_class = Circuit_1qubit # Simple_circuit_marked, Circuit_with_weights, Circuit_n
     circuit = circuit_class(n_qubits, dim_x, layers)
 
     weights_samples = 10000**(1/circuit.dim_w)
@@ -18,7 +20,7 @@ for layers in range(1,11):
 
 
     dev = qml.device('lightning.qubit', wires=circuit.n_qubits)
-    main(weights_samples, weights_search, bins_hist, circuit, dev)
+    main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name)
 
 
 #%%
@@ -68,3 +70,7 @@ for dim_x in range(2,11):
     main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name)
 
 #%%
+import time
+
+et = 3600
+print(f'total = {time.strftime("%d %H:%M:%S", time.gmtime(et))}')

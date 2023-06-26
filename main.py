@@ -33,14 +33,14 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name):
     vec_f_inf = []
     vec_f_RKHS = []
     RKHS_over_inf = []
-    temp_nvecs = []
+    # temp_nvecs = [] # This array use to print the values of the parameters together with the norms in the data csv
     qnode = qml.QNode(circuit.circuit, dev)
     for i, nvec in enumerate(nvecs,0):
         f_inf, f_RKHS = fourier_coefficients_dD(qnode, nvec, circuit.dim_x)
         vec_f_inf.append(f_inf)
         vec_f_RKHS.append(f_RKHS)
         RKHS_over_inf.append(f_RKHS/f_inf)
-        temp_nvecs.append(list(nvec))
+        # temp_nvecs.append(list(nvec))
         
         perc = (i+1)/int(weights_samples**circuit.dim_w)*100
         et = time.time() - st
@@ -55,13 +55,13 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name):
     vec_f_inf = ["Inf. Norm"] + vec_f_inf
     vec_f_RKHS = ["RKHS norm"] + vec_f_RKHS
     RKHS_over_inf = ["RKHS/Inf"] + RKHS_over_inf
-    temp_nvecs = [[f"theta_{i}" for i in range(circuit.dim_w)]] + temp_nvecs
+    # temp_nvecs = [[f"theta_{i}" for i in range(circuit.dim_w)]] + temp_nvecs
     file_name = f'{datetime.now().strftime("%d-%m-%Y %H-%M-%S")} - Norms_and_parameters of {circuit.name} - w={round(weights_samples**circuit.dim_w)}, n={circuit.n_qubits}, L={circuit.layers}, x={circuit.dim_x}'
-    np.savetxt(os.path.join(os.path.dirname(__file__), f'Data/{folder_name}/{file_name}.csv'), [[p[0], p[1], p[2], *p[3]] for p in zip(vec_f_inf, vec_f_RKHS, RKHS_over_inf, temp_nvecs)], delimiter=',', fmt='%s')
+    np.savetxt(os.path.join(os.path.dirname(__file__), f'Data/{folder_name}/{file_name}.csv'), [[p[0], p[1], p[2]] for p in zip(vec_f_inf, vec_f_RKHS, RKHS_over_inf)], delimiter=',', fmt='%s')
     vec_f_inf = vec_f_inf[1:]
     vec_f_RKHS = vec_f_RKHS[1:]
     RKHS_over_inf = RKHS_over_inf[1:]
-    temp_nvecs = temp_nvecs[1:]
+    # temp_nvecs = temp_nvecs[1:]
 
     # Save plots
     if not os.path.isdir(f'Plots/{folder_name}'):
