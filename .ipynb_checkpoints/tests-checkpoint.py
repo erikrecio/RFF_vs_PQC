@@ -11,7 +11,7 @@ for num_cpus in range(10,251,10):
     folder_name = "Testing multiprocessing"
     dim_x = 2
     n_qubits = layers*dim_x
-    # num_cpus = 200
+    # num_cpus = 160
 
     circuit_class = Circuit_1 # Simple_circuit_marked, Circuit_with_weights, Circuit_n
     circuit = circuit_class(n_qubits, dim_x, layers)
