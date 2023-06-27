@@ -1,18 +1,23 @@
 #%%
 from circuits import *
 
-layers = 3
-dim_x = 1
-n_qubits = 10 #layers*dim_x
-circuit_class = Circuit_1qubit # Simple_circuit_marked, Circuit_with_weights, Circuit_n
+dim_x = 5
+layers_x = 1
+layers_p = 2
+n_qubits = 5 #layers*dim_x
+circuit_class =  Circuit_big # Simple_circuit_marked, Circuit_with_weights, Circuit_n, Circuit_1qubit, Circuit_big
 
-circuit_object = circuit_class(n_qubits, dim_x, layers)
+circuit_object = circuit_class(n_qubits, dim_x, layers_x, layers_p)
 dev = qml.device("qiskit.aer", wires = circuit_object.n_qubits)
 w = np.random.uniform(size=(circuit_object.dim_w))
 x = np.random.uniform(size=(circuit_object.dim_x))
 qml.QNode(circuit_object.circuit, dev)(w, x)
 
+
+print(w[-1])
 dev._circuit.draw(output ="mpl", interactive = True)
+
+
 
 # %%
 import numpy as np

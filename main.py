@@ -28,7 +28,8 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, 
     
     qnode = qml.QNode(circuit.circuit, dev)
     
-    start_test = time.time()
+    start_time = time.time()
+
     if num_cpus > 1:
         pool = Pool(num_cpus)
         args = [[qnode, nvec, circuit.dim_x] for nvec in nvecs]
@@ -60,12 +61,14 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, 
                 j = j+1
                 bool_first_time = False
     
-    print(f"{time.time()-start_test}s - {circuit.name} - w={round(weights_samples**circuit.dim_w)}, n={circuit.n_qubits}, L={circuit.layers}, x={circuit.dim_x}")
+    
     
     
     time_now = datetime.now(ZoneInfo("Europe/Madrid")).strftime("%d-%m-%Y %H-%M-%S")
-    name = f"{circuit.name} - w={round(weights_samples**circuit.dim_w)}, n={circuit.n_qubits}, L={circuit.layers}, x={circuit.dim_x}"
+    name = f"{circuit.name} - w={round(weights_samples**circuit.dim_w)}, x={circuit.dim_x}, n={circuit.n_qubits}, Lx={circuit.layers_x}, Lp={circuit.layers_p}"
     
+    print(f"{time.time()-start_time}s - {name} - {time_now}")
+
     # Save data
     if not os.path.isdir(f'Data/{folder_name}'):
         os.mkdir(f'Data/{folder_name}')
