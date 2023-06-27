@@ -56,11 +56,12 @@ for dim_x in range(7,11):
     print(dim_x)
     
     folder_name = "07. Layers = 1, increasing dim_x and n"
-    layers = 1 #n_qubits//dim_x
-    n_qubits = layers*dim_x
+    layers_x = 1 #n_qubits//dim_x
+    layers_p = 1
+    n_qubits = layers_x*dim_x
 
     circuit_class = Circuit_3 # Simple_circuit_marked, Circuit_with_weights, Circuit_n
-    circuit = circuit_class(n_qubits, dim_x, layers)
+    circuit = circuit_class(n_qubits, dim_x, layers_x, layers_p)
 
     weights_samples = 10000**(1/circuit.dim_w)
     weights_search = "random"  # random, grid
