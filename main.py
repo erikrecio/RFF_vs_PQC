@@ -31,9 +31,9 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, 
     start_time = time.time()
 
     if num_cpus > 1:
-        pool = Pool(num_cpus)
         args = [[qnode, nvec, circuit.dim_x] for nvec in nvecs]
-        vec_f_inf, vec_f_RKHS = zip(*pool.starmap(fourier_coefficients_dD, args))
+        with Pool(num_cpus) as pool:
+            vec_f_inf, vec_f_RKHS = zip(*pool.starmap(fourier_coefficients_dD, args))
         vec_f_inf = list(vec_f_inf)
         vec_f_RKHS = list(vec_f_RKHS)
         RKHS_over_inf = [vec_f_RKHS[i]/inf for i, inf in enumerate(vec_f_inf)]
