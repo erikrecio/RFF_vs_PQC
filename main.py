@@ -24,7 +24,7 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, 
         n_ranges = [np.arange(weights_min + weights_step/2, weights_max, weights_step) for _ in range(circuit.dim_w)]
         nvecs = product(*n_ranges)
     elif weights_search == "random":
-        nvecs = np.random.uniform(low=-np.pi, high=np.pi, size=(int(weights_samples**circuit.dim_w), circuit.dim_w))
+        nvecs = np.random.uniform(low=-np.pi, high=np.pi, size=(int(round(weights_samples**circuit.dim_w)), circuit.dim_w))
     
     qnode = qml.QNode(circuit.circuit, dev)
     
@@ -54,7 +54,7 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, 
             RKHS_over_inf.append(f_RKHS/f_inf)
             # temp_nvecs.append(list(nvec))
             
-            perc = (i+1)/int(weights_samples**circuit.dim_w)*100
+            perc = (i+1)/round(weights_samples**circuit.dim_w)*100
             et = time.time() - st
             if bool_first_time and et > 20 or perc/j >= 10 or  et/60/j >= 10:
                 print(f'{round(perc,2)} %, current = {time.strftime("%H:%M:%S", time.gmtime(et))}, total = {time.strftime("%d %H:%M:%S", time.gmtime(et/perc*100))}, left = {time.strftime("%H:%M:%S", time.gmtime(et/perc*100-et))}, finishes = {(datetime.now() + timedelta(seconds = et/perc*100-et)).strftime("%H-%M-%S %d-%m-%Y")}')

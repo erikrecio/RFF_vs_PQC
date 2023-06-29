@@ -1,11 +1,11 @@
 #%%
 from circuits import *
 
-dim_x = 5
-layers_x = 1
-layers_p = 2
-n_qubits = 5 #layers*dim_x
-circuit_class =  Circuit_big # Simple_circuit_marked, Circuit_with_weights, Circuit_n, Circuit_1qubit, Circuit_big
+dim_x = 1
+layers_x = 4
+layers_p = 1
+n_qubits = layers_x #layers*dim_x
+circuit_class =  Circuit_1 # Simple_circuit_marked, Circuit_with_weights, Circuit_n, Circuit_1qubit, Circuit_big
 
 circuit_object = circuit_class(n_qubits, dim_x, layers_x, layers_p)
 dev = qml.device("qiskit.aer", wires = circuit_object.n_qubits)
