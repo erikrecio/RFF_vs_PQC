@@ -3,44 +3,10 @@ import pennylane as qml
 from pennylane.fourier import circuit_spectrum, coefficients
 from functools import partial
 from itertools import product
-
+from scipy.special import binom
 
 
 def fourier_coefficients_dD(circuit, w, d):
-
-    # Obtain the frequencies of the circuit with this function
-    x = [0]*d
-    freqs = circuit_spectrum(circuit)(w, x)
-
-    # Degree of the fourier series for each variable
-    degree = np.array([int(max(arr)) for arr in freqs.values()])
-
-    # Number of integer values for the indices n_i = -degree_i,...,0,...,degree_i
-    k = 2 * degree + 1
-
-    # Create generator for indices nvec = (n1, ..., nN), ranging from (-d1,...,-dN) to (d1,...,dN)
-    n_ranges = [np.arange(deg, -deg - 1, -1) for deg in degree]
-    nvecs = product(*n_ranges)
-
-    # Here we will collect the discretized values of function f
-    f_discrete = np.zeros(shape=tuple(k))
-
-    spacing = (2 * np.pi) / k
-    f_inf = 0
-
-    for nvec in nvecs:
-        sampling_point = spacing * np.array(nvec)
-
-        # Fill discretized function array with value of f at inputs
-        f_discrete[nvec] = circuit(w, sampling_point)
-        f_inf = abs(f_discrete[nvec]) if abs(f_discrete[nvec]) > f_inf else f_inf
-
-    coeffs = (np.fft.fftn(f_discrete) / f_discrete.size).flatten()
-    f_RKHS = np.sqrt(2*np.linalg.norm(coeffs)**2 - np.real(coeffs[0])**2)*np.sqrt((len(coeffs)+1)/2)
-
-    return f_inf, f_RKHS
-
-def fourier_coefficients_dD_not_so_old(circuit, w, d):
 
     # Obtain the frequencies of the circuit with this function
     x = [0]*d
@@ -76,7 +42,9 @@ def fourier_coefficients_dD_not_so_old(circuit, w, d):
     coeffs_final = []
     freq_final = []
     end = False
-    f_RKHS = 0
+    f_RKHS_flat = 0
+    f_RKHS_tree = 0
+    norm_pascal = 0
     nvecs = product(*n_ranges)
 
     for nvec in nvecs:
@@ -85,29 +53,41 @@ def fourier_coefficients_dD_not_so_old(circuit, w, d):
         
         # We calculate the cos and sin coefficients. We stop at 0 since the rest are repetitions of what is already calculated.
         if tuple(nvec) == tuple([0]*d):
-            cos_coef = c
+            cos_coef = np.real(c)
             sin_coef = 0
             end = True
         else:
-            cos_coef = c + np.conj(c)
-            sin_coef = 1j*(c - np.conj(c))
+            cos_coef = np.real(c + np.conj(c))
+            sin_coef = np.real(1j*(c - np.conj(c)))
         
-        # coeffs_final.extend([np.real(cos_coef), np.real(sin_coef)]) # coefficients and frequencies, not needed for now
+        # coeffs_final.extend([cos_coef, sin_coef]) # coefficients and frequencies, not needed for now
         # freq_final.append(list(nvec))
-        f_RKHS += np.real(cos_coef)**2 + np.real(sin_coef)**2
+        f_RKHS_flat += cos_coef**2 + sin_coef**2
+
+        # Calculation of the RKHS norm with a different sampling strategy, tree sampling in this case
+        pascal_coef = 1
+        for i, w in enumerate(nvec):
+            pascal_coef *= binom(2*degree[i], w+degree[i])
+
+        print(f"nvec = {nvec}, pascal_coef = {pascal_coef}")
+        f_RKHS_tree += (cos_coef/pascal_coef)**2 + (sin_coef/pascal_coef)**2
+        norm_pascal += pascal_coef**2  #np.sqrt((np.linalg.norm(pascal_coef.flatten())**2 + pascal_coef[x]**2)/2)
 
         if end:
             break
     
     # Size of half the frequency space
     omega = len(list(nvecs)) + 1
-
+    print(f"omega = {omega}, norm_pascal**2 = {norm_pascal}")
     # RKHS norm of the function given by the circuit
-    f_RKHS = np.sqrt(f_RKHS*omega)
+    f_RKHS_flat = np.sqrt(f_RKHS_flat*omega)
+    f_RKHS_tree = np.sqrt(f_RKHS_tree*norm_pascal)
 
-    coeffs_final = np.round(coeffs_final, decimals=4)
+    f_RKHS_flat_inf_omega = f_RKHS_flat/f_inf/np.sqrt(omega)
+    f_RKHS_tree_inf_omega = f_RKHS_tree/f_inf/np.sqrt(omega)
+    # coeffs_final = np.round(coeffs_final, decimals=4)
 
-    return freqs, freq_final, coeffs_final, f_inf, f_RKHS
+    return f_inf, f_RKHS_flat, f_RKHS_flat_inf_omega, f_RKHS_tree, f_RKHS_tree_inf_omega #freqs, freq_final, coeffs_final,
 
 # Example of the order of returned coefficients
 
@@ -129,6 +109,44 @@ def fourier_coefficients_dD_not_so_old(circuit, w, d):
 # [-2,  1] (doesn't appear because same as [ 2, -1])
 # [-2,  0] (doesn't appear because same as [ 2,  0])
 # [-2, -1] (doesn't appear because same as [ 2,  1])
+
+
+
+def fourier_coefficients_dD_not_so_old(circuit, w, d):
+
+    # Obtain the frequencies of the circuit with this function
+    x = [0]*d
+    freqs = circuit_spectrum(circuit)(w, x)
+
+    # Degree of the fourier series for each variable
+    degree = np.array([int(max(arr)) for arr in freqs.values()])
+
+    # Number of integer values for the indices n_i = -degree_i,...,0,...,degree_i
+    k = 2 * degree + 1
+
+    # Create generator for indices nvec = (n1, ..., nN), ranging from (-d1,...,-dN) to (d1,...,dN)
+    n_ranges = [np.arange(deg, -deg - 1, -1) for deg in degree]
+    nvecs = product(*n_ranges)
+
+    # Here we will collect the discretized values of function f
+    f_discrete = np.zeros(shape=tuple(k))
+    pascal_coefs = np.ones(shape=tuple(k))
+
+    spacing = (2 * np.pi) / k
+    f_inf = 0
+
+    for nvec in nvecs:
+        sampling_point = spacing * np.array(nvec)
+
+        # Fill discretized function array with value of f at inputs
+        f_discrete[nvec] = circuit(w, sampling_point)
+        f_inf = abs(f_discrete[nvec]) if abs(f_discrete[nvec]) > f_inf else f_inf
+
+    coeffs = (np.fft.fftn(f_discrete) / f_discrete.size).flatten()
+
+    f_RKHS = np.sqrt(2*np.linalg.norm(coeffs)**2 - np.real(coeffs[0])**2)*np.sqrt((len(coeffs)+1)/2)
+
+    return f_inf, f_RKHS
 
 
 def fourier_coefficients_dD_old(circuit, w, x):
