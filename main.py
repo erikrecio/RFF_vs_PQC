@@ -37,7 +37,7 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, 
     with Pool(num_cpus) as pool:
         data["Inf. Norm"], data["Flat RKHS norm"], data["Flat RKHS over Inf.Omega"], data["Tree RKHS norm"], data["Tree RKHS over Inf.Omega"] = zip(*pool.starmap(fourier_coefficients_dD, args))            
     
-    data = pd.Dataframe(data)
+    data = pd.DataFrame(data)
 
     # vec_f_inf = list(vec_f_inf)
     # vec_f_RKHS = list(vec_f_RKHS)
