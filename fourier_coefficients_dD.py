@@ -39,8 +39,8 @@ def fourier_coefficients_dD(circuit, w, d):
 
 
     # Now we transform the exponential coefficients into the coefficients for cos and sin expansion
-    coeffs_final = []
-    freq_final = []
+    # coeffs_final = []
+    # freq_final = []
     end = False
     f_RKHS_flat = 0
     f_RKHS_tree = 0
