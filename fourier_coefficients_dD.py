@@ -69,7 +69,7 @@ def fourier_coefficients_dD(circuit, w, d):
         for i, w in enumerate(nvec):
             pascal_coef *= binom(2*degree[i], w+degree[i])
 
-        print(f"nvec = {nvec}, pascal_coef = {pascal_coef}")
+        # print(f"nvec = {nvec}, pascal_coef = {pascal_coef}")
         f_RKHS_tree += (cos_coef/pascal_coef)**2 + (sin_coef/pascal_coef)**2
         norm_pascal += pascal_coef**2  #np.sqrt((np.linalg.norm(pascal_coef.flatten())**2 + pascal_coef[x]**2)/2)
 
@@ -78,7 +78,7 @@ def fourier_coefficients_dD(circuit, w, d):
     
     # Size of half the frequency space
     omega = len(list(nvecs)) + 1
-    print(f"omega = {omega}, norm_pascal**2 = {norm_pascal}")
+    # print(f"omega = {omega}, norm_pascal**2 = {norm_pascal}")
     # RKHS norm of the function given by the circuit
     f_RKHS_flat = np.sqrt(f_RKHS_flat*omega)
     f_RKHS_tree = np.sqrt(f_RKHS_tree*norm_pascal)
