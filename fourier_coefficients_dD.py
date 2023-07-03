@@ -83,8 +83,8 @@ def fourier_coefficients_dD(circuit, w, d):
     f_RKHS_flat = np.sqrt(f_RKHS_flat*omega)
     f_RKHS_tree = np.sqrt(f_RKHS_tree*norm_pascal)
 
-    f_RKHS_flat_inf_omega = f_RKHS_flat/f_inf/np.sqrt(omega)
-    f_RKHS_tree_inf_omega = f_RKHS_tree/f_inf/np.sqrt(omega)
+    f_RKHS_flat_inf_omega = f_RKHS_flat/f_inf/np.sqrt(2*omega)
+    f_RKHS_tree_inf_omega = f_RKHS_tree/f_inf/np.sqrt(2**(2*sum(degree)))
     # coeffs_final = np.round(coeffs_final, decimals=4)
 
     return f_inf, f_RKHS_flat, f_RKHS_flat_inf_omega, f_RKHS_tree, f_RKHS_tree_inf_omega #freqs, freq_final, coeffs_final,

@@ -9,8 +9,8 @@ import time
 import seaborn as sns
 
 
-mypath = "Data/13.2 10q, 2D, Lp=10, increasing Lx/"
-num_csv = 5
+mypath = "Data/15. 10q, 1D, Lp=1, increasing Lx/"
+num_csv = 4
 labels_remove = []
 # labels_data = [
 #     "Lp = 1",
@@ -26,16 +26,16 @@ labels_remove = []
 # ]
 
 labels_data = [
-    "Lx=1",
+    # "Lx=1",
     "Lx=2",
     "Lx=3",
     "Lx=4",
     "Lx=5",
-    # "Lx=6",
-    # "Lx=7",
-    # "Lx=8",
-    # "Lx=9",
-    # "Lx=10",
+    "Lx=6",
+    "Lx=7",
+    "Lx=8",
+    "Lx=9",
+    "Lx=10",
 ]
 
 # labels_data = [
@@ -61,12 +61,16 @@ csv_names = [f for f in listdir(mypath) if isfile(join(mypath, f))]
 # labels_data = [l for i, l in enumerate(labels_data) if i not in labels_remove]
 
 abs_max_inf = 0
-abs_max_rkhs = 0
-abs_max_rkhs_inf = 0
+abs_max_flat_rkhs = 0
+abs_max_flat_rkhs_inf = 0
+abs_max_tree_rkhs = 0
+abs_max_tree_rkhs_inf = 0
 
 data_inf = {}
-data_rkhs = {}
-data_inf_rkhs = {}
+data_flat_rkhs = {}
+data_flat_rkhs_inf = {}
+data_tree_rkhs = {}
+data_tree_rkhs_inf = {}
 
 for i, csv_name in enumerate(csv_names):
     
@@ -75,28 +79,37 @@ for i, csv_name in enumerate(csv_names):
         csv = pd.read_csv(mypath + csv_name)
 
         max = csv.max()
-        abs_max_inf = max[0] if abs_max_inf < max[0] else abs_max_inf
-        abs_max_rkhs = max[1] if abs_max_rkhs < max[1] else abs_max_rkhs
-        abs_max_rkhs_inf = max[2] if abs_max_rkhs_inf < max[2] else abs_max_rkhs_inf
+        abs_max_inf = max[1] if abs_max_inf < max[1] else abs_max_inf
+        abs_max_flat_rkhs = max[2] if abs_max_flat_rkhs < max[2] else abs_max_flat_rkhs
+        abs_max_flat_rkhs_inf = max[3] if abs_max_flat_rkhs_inf < max[3] else abs_max_flat_rkhs_inf
+        abs_max_tree_rkhs = max[4] if abs_max_tree_rkhs < max[4] else abs_max_tree_rkhs
+        abs_max_tree_rkhs_inf = max[5] if abs_max_tree_rkhs_inf < max[5] else abs_max_tree_rkhs_inf
 
-        names = ["Infiniy norm", "RKHS norm", "RKHS over Infinity"]
+        # names = ["Infiniy norm", "Flat RKHS norm", "Flat RKHS over Inf. Omega", "Tree RKHS norm", "Tree RKHS over Inf. Omega"]
         data_inf[labels_data[i]] = list(csv["Inf. Norm"])
-        data_rkhs[labels_data[i]] = list(csv["RKHS norm"])
-        data_inf_rkhs[labels_data[i]] = list(csv["RKHS/Inf"])
+        data_flat_rkhs[labels_data[i]] = list(csv["Flat RKHS norm"])
+        data_flat_rkhs_inf[labels_data[i]] = list(csv["Flat RKHS over Inf.Omega"])
+        data_tree_rkhs[labels_data[i]] = list(csv["Tree RKHS norm"])
+        data_tree_rkhs_inf[labels_data[i]] = list(csv["Tree RKHS over Inf.Omega"])
 
+right_limit = [
+    1.12*abs_max_inf,
+    1.12*abs_max_flat_rkhs,
+    1.12*abs_max_flat_rkhs_inf,
+    3, #1.12*abs_max_tree_rkhs
+    20, #1.12*abs_max_tree_rkhs_inf
+]
+names = ["Infiniy norm", "Flat RKHS norm", "Flat RKHS over Inf. Omega", "Tree RKHS norm", "Tree RKHS over Inf. Omega"]
+data = [pd.DataFrame(data_inf), pd.DataFrame(data_flat_rkhs), pd.DataFrame(data_flat_rkhs_inf), pd.DataFrame(data_tree_rkhs), pd.DataFrame(data_tree_rkhs_inf)]
 
-right_limit = [1.12*abs_max_inf, 1.12*abs_max_rkhs, 1.12*abs_max_rkhs_inf]
-names = ["Infiniy norm", "RKHS norm", "RKHS over Infinity"]
-datas = [pd.DataFrame(data_inf), pd.DataFrame(data_rkhs), pd.DataFrame(data_inf_rkhs)]
+for j, (name, d, rl) in enumerate(zip(names, data, right_limit)):
 
-for j, (name, data) in enumerate(zip(names, datas)):
-
-    sns.displot(data, kind="kde") #bins=bins, color='blue'
+    sns.displot(d, kind="kde") #bins=bins, color='blue'
 
     plot_name = f'{name} of {csv_name[46:-4]}'
     plt.title(plot_name)
     plt.xlabel(name)
-    plt.xlim(left=0, right=right_limit[j])
+    plt.xlim(left=0, right=rl)
     file_name = f'{datetime.now().strftime("%d-%m-%Y %H-%M-%S")} - {plot_name}'
     plt.savefig(os.path.join(os.path.dirname(__file__), f'Plots/plot_histograms/{file_name}.png'), bbox_inches="tight")
     # plt.show()
