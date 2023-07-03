@@ -9,7 +9,7 @@ import time
 import seaborn as sns
 
 
-mypath = "Data/15. 10q, 1D, Lp=1, increasing Lx/"
+mypath = "Data/17. 1D, Lp=5, increasing Lx and n/"
 num_csv = 4
 labels_remove = []
 # labels_data = [
