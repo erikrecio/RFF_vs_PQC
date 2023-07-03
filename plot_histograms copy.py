@@ -85,21 +85,20 @@ for i, csv_name in enumerate(csv_names):
         abs_max_tree_rkhs = max[4] if abs_max_tree_rkhs < max[4] else abs_max_tree_rkhs
         abs_max_tree_rkhs_inf = max[5] if abs_max_tree_rkhs_inf < max[5] else abs_max_tree_rkhs_inf
 
-        # names = ["Infiniy norm", "Flat RKHS norm", "Flat RKHS over Inf. Omega", "Tree RKHS norm", "Tree RKHS over Inf. Omega"]
         data_inf[labels_data[i]] = list(csv["Inf. Norm"])
-        data_flat_rkhs[labels_data[i]] = list(csv["Flat RKHS norm"])
-        data_flat_rkhs_inf[labels_data[i]] = list(csv["Flat RKHS over Inf.Omega"])
-        data_tree_rkhs[labels_data[i]] = list(csv["Tree RKHS norm"])
-        data_tree_rkhs_inf[labels_data[i]] = list(csv["Tree RKHS over Inf.Omega"])
+        data_flat_rkhs[labels_data[i]] = list(csv["Flat RKHS"])
+        data_flat_rkhs_inf[labels_data[i]] = list(csv["FlatRK over norm"])
+        data_tree_rkhs[labels_data[i]] = list(csv["Tree RKHS"])
+        data_tree_rkhs_inf[labels_data[i]] = list(csv["TreeRK over norm"])
 
 right_limit = [
     1.12*abs_max_inf,
     1.12*abs_max_flat_rkhs,
     1.12*abs_max_flat_rkhs_inf,
-    3, #1.12*abs_max_tree_rkhs
-    20, #1.12*abs_max_tree_rkhs_inf
+    3, #1.12*abs_max_tree_rkhs,
+    1.12*abs_max_tree_rkhs_inf,
 ]
-names = ["Infiniy norm", "Flat RKHS norm", "Flat RKHS over Inf. Omega", "Tree RKHS norm", "Tree RKHS over Inf. Omega"]
+names = ["Inf. Norm", "Flat RKHS", "FlatRK over norm", "Tree RKHS", "TreeRK over norm"]
 data = [pd.DataFrame(data_inf), pd.DataFrame(data_flat_rkhs), pd.DataFrame(data_flat_rkhs_inf), pd.DataFrame(data_tree_rkhs), pd.DataFrame(data_tree_rkhs_inf)]
 
 for j, (name, d, rl) in enumerate(zip(names, data, right_limit)):

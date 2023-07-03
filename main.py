@@ -35,7 +35,7 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, 
     args = [[qnode, nvec, circuit.dim_x] for nvec in nvecs]
     data = {}
     with Pool(num_cpus) as pool:
-        data["Inf. Norm"], data["Flat RKHS norm"], data["Flat RKHS over Inf.Omega"], data["Tree RKHS norm"], data["Tree RKHS over Inf.Omega"] = zip(*pool.starmap(fourier_coefficients_dD, args))            
+        data["Inf. Norm"], data["Flat RKHS"], data["FlatRK over norm"], data["Tree RKHS"], data["TreeRK over norm"] = zip(*pool.starmap(fourier_coefficients_dD, args))            
     
     data = pd.DataFrame(data)
 
@@ -75,7 +75,7 @@ def main(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, 
     
     
     time_now = datetime.now(ZoneInfo("Europe/Madrid")).strftime("%d-%m-%Y %H-%M-%S")
-    name = f"{circuit.name} - w={round(weights_samples**circuit.dim_w)}, x={circuit.dim_x}, n={circuit.n_qubits}, Lx={circuit.layers_x}, Lp={circuit.layers_p}"
+    name = f"{circuit.name} - x={circuit.dim_x}, n={circuit.n_qubits}, Lx={circuit.layers_x}, Lp={circuit.layers_p}" #w={round(weights_samples**circuit.dim_w)}
     
     print(f"{time.time()-start_time}s - {name} - {time_now}")
 
