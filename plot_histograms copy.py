@@ -9,24 +9,37 @@ import time
 import seaborn as sns
 
 
-mypath = "Data/17. 1D, Lp=5, increasing Lx and n/"
+mypath = "Data/20. 2D, Lp=3, increasing Lx and n/" #Circuit 3, 10qubits, max L, increasing dim_x/"
 num_csv = 4
 labels_remove = []
+# labels_data = [
+#     "dim_x = 1",
+#     "dim_x = 2",
+#     "dim_x = 3",
+#     "dim_x = 4",
+#     "dim_x = 5",
+#     "dim_x = 6",
+#     "dim_x = 7",
+#     "dim_x = 8",
+#     "dim_x = 9",
+#     "dim_x = 10",
+# ]
+
 # labels_data = [
 #     "Lp = 1",
 #     "Lp = 2",
 #     "Lp = 3",
 #     "Lp = 4",
 #     "Lp = 5",
-#     "Lp = 6",
-#     "Lp = 7",
-#     "Lp = 8",
-#     "Lp = 9",
-#     "Lp = 10",
+    # "Lp = 6",
+    # "Lp = 7",
+    # "Lp = 8",
+    # "Lp = 9",
+    # "Lp = 10",
 # ]
 
 labels_data = [
-    # "Lx=1",
+    "Lx=1",
     "Lx=2",
     "Lx=3",
     "Lx=4",
@@ -34,8 +47,8 @@ labels_data = [
     "Lx=6",
     "Lx=7",
     "Lx=8",
-    "Lx=9",
-    "Lx=10",
+    # "Lx=9",
+    # "Lx=10",
 ]
 
 # labels_data = [
@@ -95,7 +108,7 @@ right_limit = [
     1.12*abs_max_inf,
     1.12*abs_max_flat_rkhs,
     1.12*abs_max_flat_rkhs_inf,
-    3, #1.12*abs_max_tree_rkhs,
+    1.12*abs_max_tree_rkhs,
     1.12*abs_max_tree_rkhs_inf,
 ]
 names = ["Inf. Norm", "Flat RKHS", "FlatRK over norm", "Tree RKHS", "TreeRK over norm"]
@@ -109,7 +122,7 @@ for j, (name, d, rl) in enumerate(zip(names, data, right_limit)):
     plt.title(plot_name)
     plt.xlabel(name)
     plt.xlim(left=0, right=rl)
-    file_name = f'{datetime.now().strftime("%d-%m-%Y %H-%M-%S")} - {plot_name}'
+    file_name = f'{datetime.now().strftime("%Y-%m-%d %H-%M-%S")} - {plot_name}'
     plt.savefig(os.path.join(os.path.dirname(__file__), f'Plots/plot_histograms/{file_name}.png'), bbox_inches="tight")
     # plt.show()
     plt.clf()

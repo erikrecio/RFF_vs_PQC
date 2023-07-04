@@ -39,8 +39,8 @@ def fourier_coefficients_dD(circuit, w, d):
 
 
     # Now we transform the exponential coefficients into the coefficients for cos and sin expansion
-    # coeffs_final = []
-    # freq_final = []
+    coeffs_final = []
+    freq_final = []
     end = False
     f_RKHS_flat = 0
     f_RKHS_tree = 0
@@ -60,8 +60,8 @@ def fourier_coefficients_dD(circuit, w, d):
             cos_coef = np.real(c + np.conj(c))
             sin_coef = np.real(1j*(c - np.conj(c)))
         
-        # coeffs_final.extend([cos_coef, sin_coef]) # coefficients and frequencies, not needed for now
-        # freq_final.append(list(nvec))
+        coeffs_final.extend([cos_coef, sin_coef]) # coefficients and frequencies, not needed for now
+        freq_final.append(list(nvec))
         f_RKHS_flat += cos_coef**2 + sin_coef**2
 
         # Calculation of the RKHS norm with a different sampling strategy, tree sampling in this case
@@ -69,7 +69,6 @@ def fourier_coefficients_dD(circuit, w, d):
         for i, w in enumerate(nvec):
             pascal_coef *= binom(2*degree[i], w+degree[i])
 
-        # print(f"nvec = {nvec}, pascal_coef = {pascal_coef}")
         f_RKHS_tree += (cos_coef/pascal_coef)**2 + (sin_coef/pascal_coef)**2
         norm_pascal += pascal_coef**2  #np.sqrt((np.linalg.norm(pascal_coef.flatten())**2 + pascal_coef[x]**2)/2)
 
@@ -78,16 +77,16 @@ def fourier_coefficients_dD(circuit, w, d):
     
     # Size of half the frequency space
     omega = len(list(nvecs)) + 1
-    # print(f"omega = {omega}, norm_pascal**2 = {norm_pascal}")
+
     # RKHS norm of the function given by the circuit
     f_RKHS_flat = np.sqrt(f_RKHS_flat*omega)
     f_RKHS_tree = np.sqrt(f_RKHS_tree*norm_pascal)
 
     f_RKHS_flat_inf_omega = f_RKHS_flat/f_inf/np.sqrt(2*omega)
     f_RKHS_tree_inf_omega = f_RKHS_tree/f_inf/np.sqrt(2*norm_pascal)
-    # coeffs_final = np.round(coeffs_final, decimals=4)
+    coeffs_final = np.round(coeffs_final, decimals=4)
 
-    return f_inf, f_RKHS_flat, f_RKHS_flat_inf_omega, f_RKHS_tree, f_RKHS_tree_inf_omega #freqs, freq_final, coeffs_final,
+    return f_inf, f_RKHS_flat, f_RKHS_flat_inf_omega, f_RKHS_tree, f_RKHS_tree_inf_omega, freqs, freq_final, coeffs_final
 
 # Example of the order of returned coefficients
 
