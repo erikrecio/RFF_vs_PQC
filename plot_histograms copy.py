@@ -9,11 +9,11 @@ import time
 import seaborn as sns
 
 
-mypath = "Data/20. 2D, Lp=3, increasing Lx and n/" #Circuit 3, 10qubits, max L, increasing dim_x/"
+mypath = "Data/23. PLOT 4 - Lx=1, n=dim_x=4, increasing Lp/"
 num_csv = 4
 labels_remove = []
 # labels_data = [
-#     "dim_x = 1",
+#     # "dim_x = 1",
 #     "dim_x = 2",
 #     "dim_x = 3",
 #     "dim_x = 4",
@@ -25,31 +25,31 @@ labels_remove = []
 #     "dim_x = 10",
 # ]
 
-# labels_data = [
-#     "Lp = 1",
-#     "Lp = 2",
-#     "Lp = 3",
-#     "Lp = 4",
-#     "Lp = 5",
-    # "Lp = 6",
-    # "Lp = 7",
-    # "Lp = 8",
-    # "Lp = 9",
-    # "Lp = 10",
-# ]
-
 labels_data = [
-    "Lx=1",
-    "Lx=2",
-    "Lx=3",
-    "Lx=4",
-    "Lx=5",
-    "Lx=6",
-    "Lx=7",
-    "Lx=8",
+    "Lp = 1",
+    "Lp = 2",
+    "Lp = 3",
+    "Lp = 4",
+    "Lp = 5",
+    "Lp = 6",
+    "Lp = 7",
+    "Lp = 8",
+    "Lp = 9",
+    "Lp = 10",
+]
+
+# labels_data = [
+#     "Lx=1",
+#     "Lx=2",
+#     "Lx=3",
+#     "Lx=4",
+#     "Lx=5",
+#     "Lx=6",
+#     "Lx=7",
+#     "Lx=8",
     # "Lx=9",
     # "Lx=10",
-]
+# ]
 
 # labels_data = [
 #     "n=2",
@@ -92,11 +92,11 @@ for i, csv_name in enumerate(csv_names):
         csv = pd.read_csv(mypath + csv_name)
 
         max = csv.max()
-        abs_max_inf = max[1] if abs_max_inf < max[1] else abs_max_inf
-        abs_max_flat_rkhs = max[2] if abs_max_flat_rkhs < max[2] else abs_max_flat_rkhs
-        abs_max_flat_rkhs_inf = max[3] if abs_max_flat_rkhs_inf < max[3] else abs_max_flat_rkhs_inf
-        abs_max_tree_rkhs = max[4] if abs_max_tree_rkhs < max[4] else abs_max_tree_rkhs
-        abs_max_tree_rkhs_inf = max[5] if abs_max_tree_rkhs_inf < max[5] else abs_max_tree_rkhs_inf
+        abs_max_inf = max[0] if abs_max_inf < max[0] else abs_max_inf
+        abs_max_flat_rkhs = max[1] if abs_max_flat_rkhs < max[1] else abs_max_flat_rkhs
+        abs_max_flat_rkhs_inf = max[2] if abs_max_flat_rkhs_inf < max[2] else abs_max_flat_rkhs_inf
+        abs_max_tree_rkhs = max[3] if abs_max_tree_rkhs < max[3] else abs_max_tree_rkhs
+        abs_max_tree_rkhs_inf = max[4] if abs_max_tree_rkhs_inf < max[4] else abs_max_tree_rkhs_inf
 
         data_inf[labels_data[i]] = list(csv["Inf. Norm"])
         data_flat_rkhs[labels_data[i]] = list(csv["Flat RKHS"])

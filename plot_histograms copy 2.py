@@ -9,9 +9,9 @@ import time
 import seaborn as sns
 
 
-mypath = "Data/00. Old/06. Circuit 3, 10qubits, max L, increasing dim_x/"
-num_csv = 4
-labels_remove = []
+mypath = "Data/00. Old/07. Layers = 1, increasing dim_x and n/"
+num_csv = 6
+labels_remove = [0]
 labels_data = [
     "dim_x = 1",
     "dim_x = 2",
@@ -95,13 +95,13 @@ for i, csv_name in enumerate(csv_names):
         csv = pd.read_csv(mypath + csv_name)
 
         max = csv.max()
-        abs_max_inf = max[1] if abs_max_inf < max[1] else abs_max_inf
-        abs_max_flat_rkhs = max[2] if abs_max_flat_rkhs < max[2] else abs_max_flat_rkhs
-        abs_max_flat_rkhs_inf = max[3] if abs_max_flat_rkhs_inf < max[3] else abs_max_flat_rkhs_inf
+        abs_max_inf = max[0] if abs_max_inf < max[0] else abs_max_inf
+        abs_max_flat_rkhs = max[1] if abs_max_flat_rkhs < max[1] else abs_max_flat_rkhs
+        abs_max_flat_rkhs_inf = max[2] if abs_max_flat_rkhs_inf < max[2] else abs_max_flat_rkhs_inf
         # abs_max_tree_rkhs = max[4] if abs_max_tree_rkhs < max[4] else abs_max_tree_rkhs
         # abs_max_tree_rkhs_inf = max[5] if abs_max_tree_rkhs_inf < max[5] else abs_max_tree_rkhs_inf
 
-        abs_max_flat_rkhs_norm = max[4] if abs_max_flat_rkhs_norm < max[4] else abs_max_flat_rkhs_norm #borrar
+        # abs_max_flat_rkhs_norm = max[4] if abs_max_flat_rkhs_norm < max[4] else abs_max_flat_rkhs_norm #borrar
 
         data_inf[labels_data[i]] = list(csv["Inf. Norm"])#list(csv["Inf. Norm"])
         data_flat_rkhs[labels_data[i]] = list(csv["RKHS norm"])#list(csv["Flat RKHS"])
@@ -109,20 +109,20 @@ for i, csv_name in enumerate(csv_names):
         # data_tree_rkhs[labels_data[i]] = list(csv["Tree RKHS"])
         # data_tree_rkhs_inf[labels_data[i]] = list(csv["TreeRK over norm"])
 
-        data_flat_rkhs_norm[labels_data[i]] = list(csv["FlatRK over norm"])#list(csv["FlatRK over norm"]) #borrar
+        # data_flat_rkhs_norm[labels_data[i]] = list(csv["FlatRK over norm"])#list(csv["FlatRK over norm"]) #borrar
 
 right_limit = [
-    0.1,#1.12*abs_max_inf,
-    0.1,#1.12*abs_max_flat_rkhs,
+    1.12*abs_max_inf,
+    1.12*abs_max_flat_rkhs,
     1.12*abs_max_flat_rkhs_inf,
 
-    1.12*abs_max_flat_rkhs_norm,
+    # 1.12*abs_max_flat_rkhs_norm,
 
-    1.12*abs_max_tree_rkhs,
-    1.12*abs_max_tree_rkhs_inf,
+    # 1.12*abs_max_tree_rkhs,
+    # 1.12*abs_max_tree_rkhs_inf,
 ]
-names = ["Inf. Norm", "Flat RKHS", "RKHS over inf", "FlatRK over norm"]#, "Tree RKHS", "TreeRK over norm"]
-data = [pd.DataFrame(data_inf), pd.DataFrame(data_flat_rkhs), pd.DataFrame(data_flat_rkhs_inf), pd.DataFrame(data_flat_rkhs_norm)]#, pd.DataFrame(data_tree_rkhs), pd.DataFrame(data_tree_rkhs_inf)]
+names = ["Inf. Norm", "Flat RKHS", "RKHS over inf"]#, "FlatRK over norm"]#, "Tree RKHS", "TreeRK over norm"]
+data = [pd.DataFrame(data_inf), pd.DataFrame(data_flat_rkhs), pd.DataFrame(data_flat_rkhs_inf)]#, pd.DataFrame(data_flat_rkhs_norm)]#, pd.DataFrame(data_tree_rkhs), pd.DataFrame(data_tree_rkhs_inf)]
 
 for j, (name, d, rl) in enumerate(zip(names, data, right_limit)):
 
@@ -138,4 +138,4 @@ for j, (name, d, rl) in enumerate(zip(names, data, right_limit)):
     plt.clf()
     time.sleep(1)
 
-    if j==1:break
+    # if j==1:break
