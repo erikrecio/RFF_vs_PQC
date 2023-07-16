@@ -73,6 +73,7 @@ def main2(num_pars, weights_search, bins_hist, circuit, dev, folder_name, num_cp
     
     # Save data ##################################################
     del data["coeffs"]
+    del data["freq_final"]
     if not os.path.isdir(f'Data/{folder_name}'):
         os.mkdir(f'Data/{folder_name}')
         
