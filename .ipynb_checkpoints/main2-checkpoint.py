@@ -15,16 +15,31 @@ from backports.zoneinfo import ZoneInfo
 from fourier_coefficients_dD import fourier_coefficients_dD
 
 
-def main2(weights_samples, weights_search, bins_hist, circuit, dev, folder_name, num_cpus):
+def main2(num_pars, weights_search, bins_hist, circuit, dev, folder_name, num_cpus, par_var):
     
     
     plots_labels = ["Inf. Norm", "Flat RKHS", "FlatRK over norm", "Tree RKHS", "TreeRK over norm"]
-    nvecs = np.random.uniform(low=-np.pi, high=np.pi, size=(int(round(weights_samples**circuit.dim_w)), circuit.dim_w))
+    
+    if par_var==0:
+        nvecs = np.random.uniform(low=-np.pi, high=np.pi, size=(num_pars, circuit.dim_w))
+    else:
+        rng = np.random.default_rng()
+        rand_pars_var = rng.choice(circuit.dim_w, par_var, replace = False)
+        fixed_nvec = np.random.uniform(low=-np.pi, high=np.pi, size=circuit.dim_w)
+        
+        nvecs = np.zeros(shape=(num_pars, circuit.dim_w))
+        
+        for i in range(num_pars):
+            for j in range(circuit.dim_w):
+                if j in rand_pars_var:
+                    nvecs[i][j] = np.random.uniform(low=-np.pi, high=np.pi, size=1)
+                else:
+                    nvecs[i][j] = 0 #fixed_nvec[j]
+        
     
     qnode = qml.QNode(circuit.circuit, dev)    
     start_time = time.time()
 
-    # if num_cpus > 1:
     args = [[qnode, nvec, circuit.dim_x] for nvec in nvecs]
     data = {}
     coeffs = {}
@@ -42,7 +57,6 @@ def main2(weights_samples, weights_search, bins_hist, circuit, dev, folder_name,
 
     col_names = []
     for nvec in data["freq_final"][0]:
-        print(nvec)
         freqs = "("
         for i, n in enumerate(nvec):
             if i==0:
@@ -58,7 +72,7 @@ def main2(weights_samples, weights_search, bins_hist, circuit, dev, folder_name,
     dic_std = dic_coeffs.std(axis=0)
     
     # Save data ##################################################
-    
+    del data["coeffs"]
     if not os.path.isdir(f'Data/{folder_name}'):
         os.mkdir(f'Data/{folder_name}')
         
@@ -85,17 +99,19 @@ def main2(weights_samples, weights_search, bins_hist, circuit, dev, folder_name,
     plt.clf()
     
     
-#     for label in plots_labels:
-#         min_bin = min(data[label])
-#         max_bin = max(data[label])
-#         width_bin = (max_bin-min_bin)/(bins_hist-1)
-#         bins = np.arange(min_bin, max_bin + 3*width_bin/2, width_bin) if round(width_bin,8) != 0 else [max_bin - 0.5, max_bin + 0.5]
+    for label in plots_labels[2:3]:
+        min_bin = min(data[label])
+        max_bin = max(data[label])
+        width_bin = (max_bin-min_bin)/(bins_hist-1)
+        bins = np.arange(min_bin, max_bin + 3*width_bin/2, width_bin) if round(width_bin,8) != 0 else [max_bin - 0.05, max_bin + 0.05]
 
-#         plt.hist(data[label], bins=bins)
-#         plot_name = f'{label} of {name}'
-#         plt.title(plot_name)
-#         plt.xlabel(label)
-#         plt.xlim(left=0)
-#         file_name = f'{time_now} - {plot_name}'
-#         plt.savefig(os.path.join(os.path.dirname(__file__), f'Plots/{folder_name}/{file_name}.png'))
-#         plt.clf()
+        plt.hist(data[label], bins=bins)
+        plot_name = f'{label} of {name}'
+        plt.title(plot_name)
+        plt.xlabel(label)
+        # if label == "Flat RKHS":
+        #     plt.xlim(left=0, right=1)
+        plt.xlim(left=0)
+        file_name = f'{time_now} - {plot_name}'
+        plt.savefig(os.path.join(os.path.dirname(__file__), f'Plots/{folder_name}/{file_name}.png'))
+        plt.clf()

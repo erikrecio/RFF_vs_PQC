@@ -215,3 +215,28 @@ class Circuit_big:
                     qml.CNOT(wires=[i,0])
 
         return qml.expval(qml.PauliZ(0))
+    
+    
+
+class Circuit_one_p:
+
+    name = "circuit_one_p"
+    
+    def __init__(self, n_qubits, dim_x, layers_x, layers_p):
+        self.dim_x = dim_x
+        self.dim_w = 1
+        self.n_qubits = n_qubits
+        self.layers_x = layers_x
+        self.layers_p = 1
+
+    def circuit(self, w, x):
+
+        qml.RY(w[0], wires=0)
+        
+        for i in range(self.n_qubits):
+            qml.RX(x[i % self.dim_x], wires=i, id=f"x{i % self.dim_x}")
+            if i+1 == self.layers_x*self.dim_x:
+                break
+
+        
+        return qml.expval(qml.PauliZ(0))
